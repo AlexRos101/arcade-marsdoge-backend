@@ -1,4 +1,4 @@
-const keccak256 = require('keccak256');
+const { soliditySha3 } = require("web3-utils");
 const config = require('../const/config');
 
 function registerAPIs(app) {
@@ -19,8 +19,12 @@ function registerAPIs(app) {
         const address = req.fields.address;
         const amount = req.fields.amount;
 
-        const plainText = config.gameID + address.toLowerCase() + amount + config.backendKey;
-        const gameSign = keccak256(plainText).toString('hex');
+        const gameSign = soliditySha3(
+            config.gameID,
+            address.toLowerCase(),
+            amount,
+            soliditySha3(config.backendKey)
+          );
 
         const ret = {
             result: true,

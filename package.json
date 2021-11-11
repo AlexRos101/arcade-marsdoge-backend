@@ -13,6 +13,6 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-formidable": "^1.2.0",
-    "keccak256": "^1.0.3"
+    "web3-utils": "^1.6.0"
   }
 }
