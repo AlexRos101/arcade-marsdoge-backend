@@ -6,7 +6,7 @@ function registerAPIs(app) {
         const address = req.fields.address;
 
         const ret = {
-            result: true,
+            result: 1,
             data: {
                 balance: 220
             },
@@ -22,12 +22,12 @@ function registerAPIs(app) {
         const gameSign = soliditySha3(
             config.gameID,
             address.toLowerCase(),
-            amount,
+            parseInt(amount, 10),
             soliditySha3(config.backendKey)
           );
 
         const ret = {
-            result: true,
+            result: 1,
             data: {
                 verification_token: gameSign
             },
