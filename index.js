@@ -5,6 +5,7 @@ const mysql = require('mysql2/promise');
 const registerAPIs = require('./manager/api_manager');
 const config = require('./const/config');
 const database = require('./const/database');
+const syncService = require('./block_sync_service');
 
 global.mysqlPool = mysql.createPool(database);
 
@@ -17,3 +18,5 @@ registerAPIs(app);
 app.listen(config.portNumber, () => {
     console.log(`Server running on port: ${config.portNumber}`);
 });
+
+syncService();

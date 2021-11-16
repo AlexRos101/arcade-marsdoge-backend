@@ -10,6 +10,11 @@ const config = {
     playfabUrl: 'https://AF783.playfabapi.com',
 
     starShardBalanceField: 'StarShardCount',
+
+    arcadeDogeBackendUrl: 'http://localhost:4000',
+    arcadeDogeSyncCnt: 1000,
+
+    serviceDelay: 5000,
 };
 
 module.exports = config;
