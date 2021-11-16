@@ -12,9 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.24.0",
     "cors": "^2.8.5",
+    "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-formidable": "^1.2.0",
+    "mysql2": "^2.3.3",
     "web3-utils": "^1.6.0"
   },
   "devDependencies": {

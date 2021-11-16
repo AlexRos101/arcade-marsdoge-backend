@@ -1,5 +1,8 @@
 const { soliditySha3, isAddress } = require('web3-utils');
+const validator = require('email-validator');
 const config = require('../const/config');
+const playFabAdapter = require('../adpater/playfab');
+const databaseManager = require('./database_manager');
 
 function response(ret, res) {
     res.setHeader('content-type', 'text/plain');
@@ -16,12 +19,11 @@ function responseInvalid(res) {
     response(ret, res);
 }
 
-function validateEmail(emailAdress) {
-    const regexEmail = '/^w+([.-]?w+)*@w+([.-]?w+)*(.w{2,3})+$/';
-    if (emailAdress.match(regexEmail)) {
-        return true;
-    }
-    return false;
+function responseFailed(res) {
+    const ret = {
+        result: false,
+    };
+    response(ret, res);
 }
 
 function registerAPIs(app) {
@@ -59,24 +61,45 @@ function registerAPIs(app) {
         response(ret, res);
     });
 
-    app.post('/register', async (req, res) => {
+    app.post('/register', (req, res) => {
         const { username } = req.fields;
         const { email } = req.fields;
         const { address } = req.fields;
+        const { password } = req.fields;
 
-        if (!username || !validateEmail(email) || !isAddress(address)) {
+        if (
+            !username ||
+            !validator.validate(email) ||
+            !isAddress(address) ||
+            !password
+        ) {
             responseInvalid(res);
             return;
         }
 
-        const ret = {
-            result: true,
-            data: {
-                fabId: '1',
-            },
-        };
+        playFabAdapter
+            .registerUser(username, email, password)
+            .then(async (fabResponse) => {
+                const result = await databaseManager.registerUser(
+                    username,
+                    email,
+                    address,
+                    fabResponse.PlayFabId
+                );
 
-        response(ret, res);
+                const ret = {
+                    result,
+                    data: {
+                        fabId: fabResponse.PlayFabId,
+                    },
+                };
+
+                response(ret, res);
+            })
+            .catch((err) => {
+                console.log(err);
+                responseFailed(res);
+            });
     });
 }
 
