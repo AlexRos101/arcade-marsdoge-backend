@@ -30,14 +30,34 @@ function registerAPIs(app) {
     app.post('/balance', async (req, res) => {
         const { address } = req.fields;
 
-        const ret = {
-            result: 1,
-            data: {
-                balance: 220,
-            },
-        };
+        if (!address) {
+            responseInvalid(res);
+            return;
+        }
 
-        response(ret, res);
+        const fabId = await databaseManager.getFabId(address);
+
+        if (fabId === -1) {
+            responseInvalid(res);
+            return;
+        }
+
+        playFabAdapter
+        .getStarShardBalance(fabId)
+        .then((balance) => {
+            const ret = {
+                result: 1,
+                data: {
+                    balance: balance,
+                },
+            };
+
+            response(ret, res);
+        })
+        .catch((err) => {
+            console.log(err);
+            responseFailed(res);
+        });
     });
 
     app.post('/verify/swap-game-point', async (req, res) => {
@@ -78,28 +98,28 @@ function registerAPIs(app) {
         }
 
         playFabAdapter
-            .registerUser(username, email, password)
-            .then(async (fabResponse) => {
-                const result = await databaseManager.registerUser(
-                    username,
-                    email,
-                    address,
-                    fabResponse.PlayFabId
-                );
+        .registerUser(username, email, password)
+        .then(async (fabResponse) => {
+            const result = await databaseManager.registerUser(
+                username,
+                email,
+                address,
+                fabResponse.PlayFabId
+            );
 
-                const ret = {
-                    result,
-                    data: {
-                        fabId: fabResponse.PlayFabId,
-                    },
-                };
+            const ret = {
+                result,
+                data: {
+                    fabId: fabResponse.PlayFabId,
+                },
+            };
 
-                response(ret, res);
-            })
-            .catch((err) => {
-                console.log(err);
-                responseFailed(res);
-            });
+            response(ret, res);
+        })
+        .catch((err) => {
+            console.log(err);
+            responseFailed(res);
+        });
     });
 }
 

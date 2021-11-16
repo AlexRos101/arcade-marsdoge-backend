@@ -77,6 +77,26 @@ async function registerUser(username, email, address, fabId) {
     return ret;
 }
 
+async function getFabId(address) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query = 'SELECT fab_id FROM tbl_user WHERE address = ?';
+
+        let [rows] = await mysqlExecute(connection, query, [address]);
+
+        if (rows.length == 0) return -1;
+        return rows[0].fab_id;
+    } catch (err) {
+        await onConnectionErr(connection, err, true);
+    }
+
+    return -1;
+}
+
 module.exports = {
     registerUser,
+    getFabId
 };
