@@ -66,7 +66,32 @@ function getStarShardBalance(fabId) {
     });
 }
 
+function setStarShardBalance(fabId, balance) {
+    return new Promise((resolve, reject) => {
+        sendPost('/Server/UpdatePlayerStatistics', {
+            PlayFabId: fabId,
+            Statistics: [
+                {
+                    StatisticName: 'StarShardCount',
+                    Value: balance
+                }
+            ]
+        })
+        .then((res) => {
+            if (res.data.code === CONST.PLAYFAB_ERR_NO.SUCCESS) {
+                resolve(balance);
+            } else {
+                reject(new Error('Update starshard failed.'));
+            }
+        })
+        .catch((err) => {
+            reject(err);
+        });
+    });
+}
+
 module.exports = {
     registerUser,
-    getStarShardBalance
+    getStarShardBalance,
+    setStarShardBalance
 };
