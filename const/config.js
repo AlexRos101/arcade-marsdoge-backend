@@ -8,6 +8,8 @@ const config = {
     titleId: 'AF783',
 
     playfabUrl: 'https://AF783.playfabapi.com',
+
+    starShardBalanceField: 'StarShardCount',
 };
 
 module.exports = config;

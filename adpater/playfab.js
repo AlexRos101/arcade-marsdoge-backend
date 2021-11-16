@@ -8,18 +8,21 @@ function sendPost(requestUrl, params) {
             method: 'post',
             url: config.playfabUrl + requestUrl,
             data: params,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-SecretKey': config.secretKey,
+            },
         })
-            .then((response) => {
-                if (response.data.code === CONST.PLAYFAB_ERR_NO.SUCCESS) {
-                    resolve(response.data.data);
-                } else {
-                    reject(new Error('Validation Error.'));
-                }
-            })
-            .catch((error) => {
-                reject(error);
-            });
+        .then((response) => {
+            if (response.data.code === CONST.PLAYFAB_ERR_NO.SUCCESS) {
+                resolve(response.data.data);
+            } else {
+                reject(new Error('Validation Error.'));
+            }
+        })
+        .catch((error) => {
+            reject(error);
+        });
     });
 }
 
@@ -33,15 +36,37 @@ function registerUser(username, email, password) {
             PlayerSecret: config.secretKey,
             Username: username,
         })
-            .then((res) => {
-                resolve(res);
-            })
-            .catch((err) => {
-                reject(err);
-            });
+        .then((res) => {
+            resolve(res);
+        })
+        .catch((err) => {
+            reject(err);
+        });
+    });
+}
+
+function getStarShardBalance(fabId) {
+    return new Promise((resolve, reject) => {
+        sendPost('/Server/GetPlayerStatistics', {
+            PlayFabId: fabId,
+        })
+        .then((res) => {
+            let balance = 0;
+            for (let i = 0; i < res.Statistics.length; i++) {
+                if (res.Statistics[i].StatisticName === config.starShardBalanceField) {
+                    balance = res.Statistics[i].Value;
+                    break;
+                }
+            }
+            resolve(balance);
+        })
+        .catch((err) => {
+            reject(err);
+        });
     });
 }
 
 module.exports = {
     registerUser,
+    getStarShardBalance
 };
