@@ -1,5 +1,29 @@
-const { soliditySha3 } = require("web3-utils");
+const { soliditySha3, isAddress } = require("web3-utils");
 const config = require('../const/config');
+
+function response(ret, res) {
+    res.setHeader('content-type', 'text/plain');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(200);
+    res.json(ret);
+}
+
+function responseInvalid(res) {
+    const ret = {
+        result: false,
+        msg: 'validation failed!',
+    };
+    response(ret, res);
+}
+
+function validateEmail(emailAdress) {
+    let regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (emailAdress.match(regexEmail)) {
+        return true; 
+    } else {
+        return false; 
+    }
+}
 
 function registerAPIs(app) {
     app.post('/balance', async (req, res) => {
@@ -35,13 +59,26 @@ function registerAPIs(app) {
 
         response(ret, res);
     });
-}
 
-function response(ret, res) {
-    res.setHeader('content-type', 'text/plain');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(200);
-    res.json(ret);
+    app.post('/register', async (req, res) => {
+        const username = req.fields.username;
+        const email = req.fields.email;
+        const address = req.fields.address;
+
+        if (!username || !validateEmail(email) || !isAddress(address)) {
+            responseInvalid(res);
+            return;
+        }
+
+        const ret = {
+            result: true,
+            data: {
+                fabId: '1'
+            }
+        };
+
+        response(ret, res);
+    });
 }
 
 module.exports = registerAPIs;
