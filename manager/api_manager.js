@@ -1,4 +1,4 @@
-const { soliditySha3, isAddress } = require("web3-utils");
+const { soliditySha3, isAddress } = require('web3-utils');
 const config = require('../const/config');
 
 function response(ret, res) {
@@ -17,22 +17,21 @@ function responseInvalid(res) {
 }
 
 function validateEmail(emailAdress) {
-    let regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (emailAdress.match(regexEmail)) {
-        return true; 
-    } else {
-        return false; 
-    }
+  let regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  if (emailAdress.match(regexEmail)) {
+    return true;
+  }
+  return false;
 }
 
 function registerAPIs(app) {
     app.post('/balance', async (req, res) => {
-        const address = req.fields.address;
+        const { address } = req.fields;
 
         const ret = {
             result: 1,
             data: {
-                balance: 220
+                balance: 220,
             },
         };
 
@@ -40,20 +39,20 @@ function registerAPIs(app) {
     });
 
     app.post('/verify/swap-game-point', async (req, res) => {
-        const address = req.fields.address;
-        const amount = req.fields.amount;
+        const { address } = req.fields;
+        const { amount } = req.fields;
 
         const gameSign = soliditySha3(
             config.gameID,
             address.toLowerCase(),
             parseInt(amount, 10),
             soliditySha3(config.backendKey)
-          );
+        );
 
         const ret = {
             result: 1,
             data: {
-                verification_token: gameSign
+                verification_token: gameSign,
             },
         };
 
@@ -61,9 +60,9 @@ function registerAPIs(app) {
     });
 
     app.post('/register', async (req, res) => {
-        const username = req.fields.username;
-        const email = req.fields.email;
-        const address = req.fields.address;
+        const { username } = req.fields;
+        const { email } = req.fields;
+        const { address } = req.fields;
 
         if (!username || !validateEmail(email) || !isAddress(address)) {
             responseInvalid(res);
@@ -73,8 +72,8 @@ function registerAPIs(app) {
         const ret = {
             result: true,
             data: {
-                fabId: '1'
-            }
+                fabId: '1',
+            },
         };
 
         response(ret, res);

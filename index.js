@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(formidableMiddleware());
 
-
 registerAPIs(app);
 
 app.listen(config.portNumber, () => {
