@@ -63,8 +63,8 @@ async function registerUser(username, email, address, fabId) {
         const [rows] = await mysqlExecute(connection, query, [
             username,
             email,
-            address,
             fabId,
+            address,
         ]);
 
         await commitTransaction(connection);
