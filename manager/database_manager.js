@@ -85,18 +85,64 @@ async function getFabId(address) {
 
         const query = 'SELECT fab_id FROM tbl_user WHERE address = ?';
 
-        let [rows] = await mysqlExecute(connection, query, [address]);
+        const [rows] = await mysqlExecute(connection, query, [address]);
 
-        if (rows.length == 0) return -1;
-        return rows[0].fab_id;
+        connection.release();
+
+        if (rows.length !== 0) {
+            return rows[0].fab_id;
+        }
     } catch (err) {
-        await onConnectionErr(connection, err, true);
+        await onConnectionErr(connection, err, false);
     }
 
     return -1;
 }
 
+async function getSyncIndex() {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query = 'SELECT sync_index FROM tbl_status WHERE id = 1';
+        const [rows] = await mysqlExecute(connection, query, []);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            return rows[0].sync_index;
+        }
+    } catch (err) {
+        await onConnectionErr(connection, err, false);
+    }
+    return -1;
+}
+
+async function updateSyncIndex(syncIndex) {
+    let connection = null;
+    let res = false;
+
+    try {
+        connection = await connect();
+
+        await startTransactions(connection);
+        const query = 'UPDATE tbl_status SET sync_index = ? WHERE id = 1';
+        const [rows] = await mysqlExecute(connection, query, [syncIndex]);
+        await commitTransaction(connection);
+
+        connection.release();
+
+        res = rows.affectRows > 0;
+    } catch (err) {
+        await onConnectionErr(connection, err, true);
+    }
+    return res;
+}
+
 module.exports = {
     registerUser,
-    getFabId
+    getFabId,
+    getSyncIndex,
+    updateSyncIndex,
 };
