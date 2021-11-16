@@ -64,6 +64,18 @@ function registerAPIs(app) {
         const { address } = req.fields;
         const { amount } = req.fields;
 
+        const fabId = await databaseManager.getFabId(address);
+        if (fabId === -1) {
+            responseInvalid(res);
+            return;
+        }
+
+        const balance = await playFabAdapter.getStarShardBalance(fabId);
+        if (balance < amount) {
+            responseInvalid(res);
+            return;
+        }
+
         const gameSign = soliditySha3(
             config.gameID,
             address.toLowerCase(),
