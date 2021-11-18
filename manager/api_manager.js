@@ -133,6 +133,26 @@ function registerAPIs(app) {
                 responseFailed(res);
             });
     });
+
+    app.post('/verify/address', async (req, res) => {
+        const { address } = req.fields;
+
+        if (!isAddress(address)) {
+            responseInvalid(res);
+            return;
+        }
+
+        const ret = {
+            result: false,
+        };
+
+        const fabId = await databaseManager.getFabId(address);
+        if (fabId !== -1) {
+            ret.result = true;
+        }
+
+        response(ret, res);
+    });
 }
 
 module.exports = registerAPIs;
