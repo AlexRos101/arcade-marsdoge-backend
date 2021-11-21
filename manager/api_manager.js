@@ -23,11 +23,23 @@ function responseInvalid(res) {
     response(ret, res);
 }
 
-function responseFailed(res) {
-    const ret = {
-        result: CONST.RET_CODE.FAILED,
-    };
-    response(ret, res);
+function responseFailed(res, msg = undefined) {
+    if (msg) {
+        response(
+            {
+                result: CONST.RET_CODE.FAILED,
+                msg,
+            },
+            res
+        );
+    } else {
+        response(
+            {
+                result: CONST.RET_CODE.FAILED,
+            },
+            res
+        );
+    }
 }
 
 function registerAPIs(app) {
@@ -121,7 +133,7 @@ function registerAPIs(app) {
         response(ret, res);
     });
 
-    app.post('/register', (req, res) => {
+    app.post('/register', async (req, res) => {
         const { username } = req.fields;
         const { email } = req.fields;
         const { address } = req.fields;
@@ -142,6 +154,18 @@ function registerAPIs(app) {
             return;
         }
 
+        const fabId = await databaseManager.getFabId(address);
+        if (fabId !== -1) {
+            response(
+                {
+                    result: CONST.RET_CODE.DUPLICATE_ADDRESS,
+                    msg: 'Duplicated address',
+                },
+                res
+            );
+            return;
+        }
+
         playFabAdapter
             .registerUser(username, email, password)
             .then(async (fabResponse) => {
@@ -152,9 +176,8 @@ function registerAPIs(app) {
                     fabResponse.PlayFabId
                 );
 
-                let ret;
                 if (result) {
-                    ret = {
+                    const ret = {
                         result: CONST.RET_CODE.SUCCESS,
                         data: {
                             fabId: fabResponse.PlayFabId,
@@ -168,7 +191,7 @@ function registerAPIs(app) {
             })
             .catch((err) => {
                 logManager.error(err);
-                responseFailed(res);
+                responseFailed(res, err.message);
             });
     });
 
