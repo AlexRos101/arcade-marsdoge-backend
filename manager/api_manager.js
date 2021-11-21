@@ -3,6 +3,7 @@ const validator = require('email-validator');
 const config = require('../const/config');
 const playFabAdapter = require('../adpater/playfab');
 const databaseManager = require('./database_manager');
+const CONST = require('../const/constants');
 
 function response(ret, res) {
     res.setHeader('content-type', 'text/plain');
@@ -13,7 +14,7 @@ function response(ret, res) {
 
 function responseInvalid(res) {
     const ret = {
-        result: false,
+        result: CONST.RET_CODE.INVALID_PARAMETERS,
         msg: 'validation failed!',
     };
     response(ret, res);
@@ -21,7 +22,7 @@ function responseInvalid(res) {
 
 function responseFailed(res) {
     const ret = {
-        result: false,
+        result: CONST.RET_CODE.FAILED,
     };
     response(ret, res);
 }
@@ -38,7 +39,13 @@ function registerAPIs(app) {
         const fabId = await databaseManager.getFabId(address);
 
         if (fabId === -1) {
-            responseInvalid(res);
+            response(
+                {
+                    result: CONST.RET_CODE.NOT_REGISTERED_WALLET_ADDRESS,
+                    msg: 'Not registered account.',
+                },
+                res
+            );
             return;
         }
 
@@ -46,7 +53,7 @@ function registerAPIs(app) {
             .getStarShardBalance(fabId)
             .then((balance) => {
                 const ret = {
-                    result: 1,
+                    result: CONST.RET_CODE.SUCCESS,
                     data: {
                         balance,
                     },
@@ -66,13 +73,25 @@ function registerAPIs(app) {
 
         const fabId = await databaseManager.getFabId(address);
         if (fabId === -1) {
-            responseInvalid(res);
+            response(
+                {
+                    result: CONST.RET_CODE.NOT_REGISTERED_WALLET_ADDRESS,
+                    msg: 'Not registered account.',
+                },
+                res
+            );
             return;
         }
 
         const balance = await playFabAdapter.getStarShardBalance(fabId);
         if (balance < amount) {
-            responseInvalid(res);
+            response(
+                {
+                    result: CONST.RET_CODE.INSUFFICIANT_BALANCE,
+                    msg: 'Insufficient balance.',
+                },
+                res
+            );
             return;
         }
 
@@ -84,7 +103,7 @@ function registerAPIs(app) {
         );
 
         const ret = {
-            result: 1,
+            result: CONST.RET_CODE.SUCCESS,
             data: {
                 verification_token: gameSign,
             },
@@ -119,14 +138,19 @@ function registerAPIs(app) {
                     fabResponse.PlayFabId
                 );
 
-                const ret = {
-                    result,
-                    data: {
-                        fabId: fabResponse.PlayFabId,
-                    },
-                };
+                let ret;
+                if (result) {
+                    ret = {
+                        result: CONST.RET_CODE.SUCCESS,
+                        data: {
+                            fabId: fabResponse.PlayFabId,
+                        },
+                    };
 
-                response(ret, res);
+                    response(ret, res);
+                } else {
+                    responseFailed(res);
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -143,12 +167,12 @@ function registerAPIs(app) {
         }
 
         const ret = {
-            result: false,
+            result: CONST.RET_CODE.FAILED,
         };
 
         const fabId = await databaseManager.getFabId(address);
         if (fabId !== -1) {
-            ret.result = true;
+            ret.result = CONST.RET_CODE.SUCCESS;
         }
 
         response(ret, res);
