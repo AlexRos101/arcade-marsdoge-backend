@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('../const/config');
+const CONST = require('../const/constants');
 
 function sendPost(requestUrl, params) {
     return new Promise((resolve, reject) => {
@@ -12,7 +13,7 @@ function sendPost(requestUrl, params) {
             },
         })
             .then((response) => {
-                if (response.data.result === 1) {
+                if (response.data.result === CONST.RET_CODE.SUCCESS) {
                     resolve(response.data.data);
                 } else {
                     reject(new Error('Getting txs failed.'));
