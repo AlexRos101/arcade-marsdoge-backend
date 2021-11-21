@@ -16,8 +16,18 @@ const TX_TYPE = {
     WITHDRAW: 6,
 };
 
+const RET_CODE = {
+    SUCCESS: 0,
+    FAILED: 1,
+    NOT_REGISTERED_WALLET_ADDRESS: 100,
+    INSUFFICIANT_BALANCE: 101,
+    INVALID_PARAMETERS: 102,
+    NOT_INITIALIZED: 103,
+};
+
 module.exports = {
     MYSQL_ERR_NO,
     PLAYFAB_ERR_NO,
     TX_TYPE,
+    RET_CODE,
 };
