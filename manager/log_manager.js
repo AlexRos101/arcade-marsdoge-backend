@@ -11,7 +11,7 @@ log4js.configure({
             //  specifies the encoding format as utf-8
             encoding: 'utf-8',
             //  log files by date （ day ） cutting 
-            pattern: "-yyyy-MM-dd",
+            pattern: "yyyy-MM-dd",
             //  when rolling back old log files, make sure to  .log  at the end （ only in the alwaysIncludePattern  for false  to take effect ）
             keepFileExt: true,
             //  the output log file name is always included pattern  end date 
