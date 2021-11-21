@@ -17,11 +17,15 @@ function sendPost(requestUrl, params) {
                 if (response.data.code === CONST.PLAYFAB_ERR_NO.SUCCESS) {
                     resolve(response.data.data);
                 } else {
-                    reject(new Error('Validation Error.'));
+                    reject(new Error(response.data.data.errorMessage));
                 }
             })
             .catch((error) => {
-                reject(error);
+                if (error.response.data.errorMessage) {
+                    reject(new Error(error.response.data.errorMessage));
+                } else {
+                    reject(error);
+                }
             });
     });
 }
