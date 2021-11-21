@@ -3,9 +3,10 @@ const playfabAdapter = require('./adpater/playfab');
 const databaseManager = require('./manager/database_manager');
 const CONST = require('./const/constants');
 const config = require('./const/config');
+const logManager = require('./manager/log_manager');
 
 async function syncTxs() {
-    console.log('Sycnronizing Txs');
+    logManager.info('Sycnronizing Txs');
 
     try {
         const syncIndex = await databaseManager.getSyncIndex();
@@ -39,10 +40,10 @@ async function syncTxs() {
             await databaseManager.updateSyncIndex(tx.id);
         }
     } catch (err) {
-        console.log(err);
+        logManager.error(err);
     }
 
-    console.log('Synchronizing Txs completed.');
+    logManager.info('Synchronizing Txs completed.');
 
     setTimeout(() => {
         syncTxs();
