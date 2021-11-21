@@ -6,6 +6,7 @@ const registerAPIs = require('./manager/api_manager');
 const config = require('./const/config');
 const database = require('./const/database');
 const syncService = require('./block_sync_service');
+const logManager = require('./manager/log_manager');
 
 global.mysqlPool = mysql.createPool(database);
 
@@ -16,7 +17,7 @@ app.use(formidableMiddleware());
 registerAPIs(app);
 
 app.listen(config.portNumber, () => {
-    console.log(`Server running on port: ${config.portNumber}`);
+    logManager.info(`Server running on port: ${config.portNumber}`);
 });
 
 syncService();

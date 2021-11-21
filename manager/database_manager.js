@@ -1,4 +1,5 @@
 const CONST = require('../const/constants');
+const logManager = require('./log_manager');
 
 /* eslint-disable */
 async function connect() {
@@ -9,7 +10,7 @@ async function connect() {
                 resolve(connection);
             })
             .catch((err) => {
-                console.log(err);
+                logManager.error(err);
                 reject(err);
             });
     });
@@ -32,7 +33,7 @@ async function rollbackTransaction(connection) {
 }
 
 async function onConnectionErr(connection, err, isRollBack = false) {
-    console.log(err);
+    logManager.error(err);
     if (connection == null) return;
     if (err.errono === CONST.MYSQL_ERR_NO.CONNECTION_ERROR) return;
     if (isRollBack) await rollbackTransaction(connection);

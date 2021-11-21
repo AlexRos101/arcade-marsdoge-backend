@@ -1,4 +1,4 @@
-const log4js = require("log4js");
+const log4js = require('log4js');
 
 log4js.configure({
     replaceConsole: true,
@@ -10,42 +10,42 @@ log4js.configure({
             filename: 'logs/logs.log',
             //  specifies the encoding format as utf-8
             encoding: 'utf-8',
-            //  log files by date （ day ） cutting 
-            pattern: "yyyy-MM-dd",
-            //  when rolling back old log files, make sure to  .log  at the end （ only in the alwaysIncludePattern  for false  to take effect ）
+            //  log files by date （ day ） cutting
+            pattern: 'yyyy-MM-dd',
+            //  when rolling back old log files, make sure to  .log  at the end
             keepFileExt: true,
-            //  the output log file name is always included pattern  end date 
+            //  the output log file name is always included pattern  end date
             alwaysIncludePattern: true,
         },
     },
     categories: {
         //  set default categories
-        default: {appenders: ['GameBackend'], level: 'debug'},
-    }
+        default: { appenders: ['GameBackend'], level: 'debug' },
+    },
 });
 
-const logger = log4js.getLogger("GameBackend");
+const logger = log4js.getLogger('GameBackend');
 
 function info(msg) {
     console.log(msg);
-    logger.level = "info";
+    logger.level = 'info';
     logger.info(msg);
 }
 
 function error(msg) {
     console.log(msg);
-    logger.level = "error";
+    logger.level = 'error';
     logger.error(msg);
 }
 
 function warn(msg) {
     console.log(msg);
-    logger.level = "warn";
+    logger.level = 'warn';
     logger.warn(msg);
 }
 
 module.exports = {
     info,
     error,
-    warn
+    warn,
 };

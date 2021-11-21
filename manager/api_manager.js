@@ -4,8 +4,11 @@ const config = require('../const/config');
 const playFabAdapter = require('../adpater/playfab');
 const databaseManager = require('./database_manager');
 const CONST = require('../const/constants');
+const logManager = require('./log_manager');
 
 function response(ret, res) {
+    logManager.info(ret);
+
     res.setHeader('content-type', 'text/plain');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200);
@@ -30,6 +33,8 @@ function responseFailed(res) {
 function registerAPIs(app) {
     app.post('/balance', async (req, res) => {
         const { address } = req.fields;
+
+        logManager.info(`"/balance" api is called: address=${address}`);
 
         if (!address) {
             responseInvalid(res);
@@ -62,7 +67,7 @@ function registerAPIs(app) {
                 response(ret, res);
             })
             .catch((err) => {
-                console.log(err);
+                logManager.error(err);
                 responseFailed(res);
             });
     });
@@ -70,6 +75,10 @@ function registerAPIs(app) {
     app.post('/verify/swap-game-point', async (req, res) => {
         const { address } = req.fields;
         const { amount } = req.fields;
+
+        logManager.info(
+            `"/verify/swap-game-point" api is called: address=${address} amount=${amount}`
+        );
 
         const fabId = await databaseManager.getFabId(address);
         if (fabId === -1) {
@@ -118,6 +127,11 @@ function registerAPIs(app) {
         const { address } = req.fields;
         const { password } = req.fields;
 
+        logManager.info(
+            `"/verify/swap-game-point" api is called: username=${username} email=${email} address=${address}` +
+                ` password=${password}`
+        );
+
         if (
             !username ||
             !validator.validate(email) ||
@@ -153,13 +167,15 @@ function registerAPIs(app) {
                 }
             })
             .catch((err) => {
-                console.log(err);
+                logManager.error(err);
                 responseFailed(res);
             });
     });
 
     app.post('/verify/address', async (req, res) => {
         const { address } = req.fields;
+
+        logManager.info(`"/verify/address" api is called: address=${address}`);
 
         if (!isAddress(address)) {
             responseInvalid(res);
