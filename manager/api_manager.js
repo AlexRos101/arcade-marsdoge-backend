@@ -7,7 +7,7 @@ const CONST = require('../const/constants');
 const logManager = require('./log_manager');
 
 function response(ret, res) {
-    logManager.info(ret);
+    logManager.info(JSON.stringify(ret));
 
     res.setHeader('content-type', 'text/plain');
     res.setHeader('Access-Control-Allow-Origin', '*');
