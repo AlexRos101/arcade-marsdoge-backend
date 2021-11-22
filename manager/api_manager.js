@@ -6,8 +6,8 @@ const databaseManager = require('./database_manager');
 const CONST = require('../const/constants');
 const logManager = require('./log_manager');
 
-function response(ret, res) {
-    logManager.info(JSON.stringify(ret));
+function response(ret, res, logIndex) {
+    logManager.info(`index: ${logIndex}, ${JSON.stringify(ret)}`);
 
     res.setHeader('content-type', 'text/plain');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,29 +15,31 @@ function response(ret, res) {
     res.json(ret);
 }
 
-function responseInvalid(res) {
+function responseInvalid(res, logIndex) {
     const ret = {
         result: CONST.RET_CODE.INVALID_PARAMETERS,
         msg: 'validation failed!',
     };
-    response(ret, res);
+    response(ret, res, logIndex);
 }
 
-function responseFailed(res, msg = undefined) {
+function responseFailed(res, logIndex, msg = undefined) {
     if (msg) {
         response(
             {
                 result: CONST.RET_CODE.FAILED,
                 msg,
             },
-            res
+            res,
+            logIndex
         );
     } else {
         response(
             {
                 result: CONST.RET_CODE.FAILED,
             },
-            res
+            res,
+            logIndex
         );
     }
 }
@@ -46,10 +48,13 @@ function registerAPIs(app) {
     app.post('/balance', async (req, res) => {
         const { address } = req.fields;
 
-        logManager.info(`"/balance" api is called: address=${address}`);
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/balance" api is called: address=${address}`
+        );
 
         if (!address) {
-            responseInvalid(res);
+            responseInvalid(res, logIndex);
             return;
         }
 
@@ -61,7 +66,8 @@ function registerAPIs(app) {
                     result: CONST.RET_CODE.NOT_REGISTERED_WALLET_ADDRESS,
                     msg: 'Not registered account.',
                 },
-                res
+                res,
+                logIndex
             );
             return;
         }
@@ -76,11 +82,11 @@ function registerAPIs(app) {
                     },
                 };
 
-                response(ret, res);
+                response(ret, res, logIndex);
             })
             .catch((err) => {
-                logManager.error(err);
-                responseFailed(res);
+                logManager.error(`index: ${logIndex}, ${JSON.stringify(err)}`);
+                responseFailed(res, logIndex, err.message);
             });
     });
 
@@ -88,8 +94,9 @@ function registerAPIs(app) {
         const { address } = req.fields;
         const { amount } = req.fields;
 
+        const logIndex = logManager.generateLogIndex();
         logManager.info(
-            `"/verify/swap-game-point" api is called: address=${address} amount=${amount}`
+            `index: ${logIndex}, "/verify/swap-game-point" api is called: address=${address} amount=${amount}`
         );
 
         const fabId = await databaseManager.getFabId(address);
@@ -99,7 +106,8 @@ function registerAPIs(app) {
                     result: CONST.RET_CODE.NOT_REGISTERED_WALLET_ADDRESS,
                     msg: 'Not registered account.',
                 },
-                res
+                res,
+                logIndex
             );
             return;
         }
@@ -111,7 +119,8 @@ function registerAPIs(app) {
                     result: CONST.RET_CODE.INSUFFICIANT_BALANCE,
                     msg: 'Insufficient balance.',
                 },
-                res
+                res,
+                logIndex
             );
             return;
         }
@@ -130,7 +139,7 @@ function registerAPIs(app) {
             },
         };
 
-        response(ret, res);
+        response(ret, res, logIndex);
     });
 
     app.post('/register', async (req, res) => {
@@ -139,9 +148,10 @@ function registerAPIs(app) {
         const { address } = req.fields;
         const { password } = req.fields;
 
+        const logIndex = logManager.generateLogIndex();
         logManager.info(
-            `"/verify/swap-game-point" api is called: username=${username} email=${email} address=${address}` +
-                ` password=${password}`
+            `index: ${logIndex}, "/verify/swap-game-point" api is called: username=${username} email=${email} ` +
+                `address=${address} password=${password}`
         );
 
         if (
@@ -150,7 +160,7 @@ function registerAPIs(app) {
             !isAddress(address) ||
             !password
         ) {
-            responseInvalid(res);
+            responseInvalid(res, logIndex);
             return;
         }
 
@@ -161,7 +171,8 @@ function registerAPIs(app) {
                     result: CONST.RET_CODE.DUPLICATE_ADDRESS,
                     msg: 'Duplicated address',
                 },
-                res
+                res,
+                logIndex
             );
             return;
         }
@@ -184,24 +195,27 @@ function registerAPIs(app) {
                         },
                     };
 
-                    response(ret, res);
+                    response(ret, res, logIndex);
                 } else {
-                    responseFailed(res);
+                    responseFailed(res, logIndex);
                 }
             })
             .catch((err) => {
-                logManager.error(err);
-                responseFailed(res, err.message);
+                logManager.error(`index: ${logIndex}, ${JSON.stringify(err)}`);
+                responseFailed(res, logIndex, err.message);
             });
     });
 
     app.post('/verify/address', async (req, res) => {
         const { address } = req.fields;
 
-        logManager.info(`"/verify/address" api is called: address=${address}`);
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/verify/address" api is called: address=${address}`
+        );
 
         if (!isAddress(address)) {
-            responseInvalid(res);
+            responseInvalid(res, logIndex);
             return;
         }
 
@@ -214,7 +228,7 @@ function registerAPIs(app) {
             ret.result = CONST.RET_CODE.SUCCESS;
         }
 
-        response(ret, res);
+        response(ret, res, logIndex);
     });
 }
 

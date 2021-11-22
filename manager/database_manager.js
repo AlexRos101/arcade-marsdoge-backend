@@ -33,7 +33,7 @@ async function rollbackTransaction(connection) {
 }
 
 async function onConnectionErr(connection, err, isRollBack = false) {
-    logManager.error(err);
+    logManager.error(JSON.stringify(err));
     if (connection == null) return;
     if (err.errono === CONST.MYSQL_ERR_NO.CONNECTION_ERROR) return;
     if (isRollBack) await rollbackTransaction(connection);
@@ -72,6 +72,9 @@ async function registerUser(username, email, address, fabId) {
         ret = rows.insertId > 0;
         connection.release();
     } catch (err) {
+        logManager.error(
+            `registerUser failed: username=${username}, email=${email}, address=${address}, fabId=${fabId}`
+        );
         await onConnectionErr(connection, err, true);
     }
 
@@ -94,6 +97,7 @@ async function getFabId(address) {
             return rows[0].fab_id;
         }
     } catch (err) {
+        logManager.error(`getFabId failed: address=${address}`);
         await onConnectionErr(connection, err, false);
     }
 
@@ -115,6 +119,7 @@ async function getSyncIndex() {
             return rows[0].sync_index;
         }
     } catch (err) {
+        logManager.error('getSyncIndex failed: no parameters');
         await onConnectionErr(connection, err, false);
     }
     return -1;
@@ -136,6 +141,7 @@ async function updateSyncIndex(syncIndex) {
 
         res = rows.affectRows > 0;
     } catch (err) {
+        logManager.error(`updateSyncIndex failed: syncIndex=${syncIndex}`);
         await onConnectionErr(connection, err, true);
     }
     return res;
