@@ -1,5 +1,5 @@
-const arcadeDogeBackendAdapter = require('./adpater/arcade_backend');
-const playfabAdapter = require('./adpater/playfab');
+const arcadeDogeBackendAdapter = require('./adapter/arcade_backend');
+const playfabAdapter = require('./adapter/playfab');
 const databaseManager = require('./manager/database_manager');
 const CONST = require('./const/constants');
 const config = require('./const/config');
