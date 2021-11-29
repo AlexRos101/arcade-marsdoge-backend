@@ -1,7 +1,7 @@
 const { soliditySha3, isAddress } = require('web3-utils');
 const validator = require('email-validator');
 const config = require('../const/config');
-const playFabAdapter = require('../adpater/playfab');
+const playFabAdapter = require('../adapter/playfab');
 const databaseManager = require('./database_manager');
 const CONST = require('../const/constants');
 const logManager = require('./log_manager');
