@@ -1,0 +1,34 @@
+const MYSQL_ERR_NO = {
+    CONNECTION_ERROR: -4078,
+};
+
+const PLAYFAB_ERR_NO = {
+    SUCCESS: 200,
+    BAD_REQUEST: 400,
+};
+
+const TX_TYPE = {
+    MINT: 1,
+    EXCHANGE: 2,
+    BURN: 3,
+    TRANSFER: 4,
+    DEPOSIT: 5,
+    WITHDRAW: 6,
+};
+
+const RET_CODE = {
+    SUCCESS: 0,
+    FAILED: 1,
+    NOT_REGISTERED_WALLET_ADDRESS: 100,
+    INSUFFICIANT_BALANCE: 101,
+    INVALID_PARAMETERS: 102,
+    NOT_INITIALIZED: 103,
+    DUPLICATE_ADDRESS: 104,
+};
+
+module.exports = {
+    MYSQL_ERR_NO,
+    PLAYFAB_ERR_NO,
+    TX_TYPE,
+    RET_CODE,
+};
