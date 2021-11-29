@@ -150,7 +150,7 @@ function registerAPIs(app) {
 
         const logIndex = logManager.generateLogIndex();
         logManager.info(
-            `index: ${logIndex}, "/verify/swap-game-point" api is called: username=${username} email=${email} ` +
+            `index: ${logIndex}, "/register" api is called: username=${username} email=${email} ` +
                 `address=${address} password=${password}`
         );
 
