@@ -72,22 +72,23 @@ function registerAPIs(app) {
             return;
         }
 
-        playFabAdapter
-            .getStarShardBalance(fabId)
-            .then((balance) => {
-                const ret = {
-                    result: CONST.RET_CODE.SUCCESS,
-                    data: {
-                        balance,
-                    },
-                };
+        try {
+            const starShardBalande = await playFabAdapter.getStarShardBalance(fabId);
+            const pendingStarShardBalande = await playFabAdapter.getPendingStarShardBalance(fabId);
 
-                response(ret, res, logIndex);
-            })
-            .catch((err) => {
-                logManager.error(`index: ${logIndex}, ${JSON.stringify(err)}`);
-                responseFailed(res, logIndex, err.message);
-            });
+            const balance = starShardBalande + pendingStarShardBalande;
+            const ret = {
+                result: CONST.RET_CODE.SUCCESS,
+                data: {
+                    balance,
+                },
+            };
+
+            response(ret, res, logIndex);
+        } catch (err) {
+            logManager.error(`index: ${logIndex}, ${JSON.stringify(err)}`);
+            responseFailed(res, logIndex, err.message);
+        }
     });
 
     app.post('/verify/swap-game-point', async (req, res) => {
@@ -112,7 +113,9 @@ function registerAPIs(app) {
             return;
         }
 
-        const balance = await playFabAdapter.getStarShardBalance(fabId);
+        let balance = await playFabAdapter.getStarShardBalance(fabId);
+        const pendingBalance = await playFabAdapter.getPendingStarShardBalance(fabId);
+        balance = balance + pendingBalance;
         if (balance < amount) {
             response(
                 {
