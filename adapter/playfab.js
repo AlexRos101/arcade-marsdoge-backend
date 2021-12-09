@@ -61,68 +61,18 @@ function getStarShardBalance(fabId) {
                 );
                 const pendingStarShards = res.Statistics.filter(
                     (stats) =>
-                        stats.StatisticName === config.pendingStarShardBalanceField
+                        stats.StatisticName ===
+                        config.pendingStarShardBalanceField
                 );
 
                 resolve({
-                    StarShards: starShards.length > 0 ? 
-                })
-
-                let balance = 0;
-                for (let i = 0; i < res.Statistics.length; i++) {
-                    if (
-                        res.Statistics[i].StatisticName ===
-                        config.starShardBalanceField
-                    ) {
-                        balance = res.Statistics[i].Value;
-                        break;
-                    }
-                }
-                resolve(balance);
-            })
-            .catch((err) => {
-                reject(err);
-            });
-    });
-}
-
-function getPendingStarShardBalance(fabId) {
-    return new Promise((resolve, reject) => {
-        sendPost('/Server/GetPlayerStatistics', {
-            PlayFabId: fabId,
-        })
-            .then((res) => {
-                let balance = 0;
-                for (let i = 0; i < res.Statistics.length; i++) {
-                    if (
-                        res.Statistics[i].StatisticName ===
-                        config.pendingStarShardBalanceField
-                    ) {
-                        balance = res.Statistics[i].Value;
-                        break;
-                    }
-                }
-                resolve(balance);
-            })
-            .catch((err) => {
-                reject(err);
-            });
-    });
-}
-
-function setStarShardBalance(fabId, balance) {
-    return new Promise((resolve, reject) => {
-        sendPost('/Server/UpdatePlayerStatistics', {
-            PlayFabId: fabId,
-            Statistics: [
-                {
-                    StatisticName: 'StarShardCount',
-                    Value: balance,
-                },
-            ],
-        })
-            .then((res) => {
-                resolve(res);
+                    StarShards:
+                        starShards.length > 0 ? starShards[0].Value : null,
+                    PendingStarShards:
+                        pendingStarShards.length > 0 ?
+                            pendingStarShards[0].Value :
+                            null,
+                });
             })
             .catch((err) => {
                 reject(err);
@@ -153,7 +103,5 @@ function setPendingStarShardBalance(fabId, balance) {
 module.exports = {
     registerUser,
     getStarShardBalance,
-    setStarShardBalance,
-    getPendingStarShardBalance,
     setPendingStarShardBalance,
 };
