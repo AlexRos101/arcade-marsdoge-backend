@@ -73,6 +73,30 @@ function getStarShardBalance(fabId) {
     });
 }
 
+function getPendingStarShardBalance(fabId) {
+    return new Promise((resolve, reject) => {
+        sendPost('/Server/GetPlayerStatistics', {
+            PlayFabId: fabId,
+        })
+            .then((res) => {
+                let balance = 0;
+                for (let i = 0; i < res.Statistics.length; i++) {
+                    if (
+                        res.Statistics[i].StatisticName ===
+                        config.pendingStarShardBalanceField
+                    ) {
+                        balance = res.Statistics[i].Value;
+                        break;
+                    }
+                }
+                resolve(balance);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+    });
+}
+
 function setStarShardBalance(fabId, balance) {
     return new Promise((resolve, reject) => {
         sendPost('/Server/UpdatePlayerStatistics', {
@@ -93,8 +117,30 @@ function setStarShardBalance(fabId, balance) {
     });
 }
 
+function setPendingStarShardBalance(fabId, balance) {
+    return new Promise((resolve, reject) => {
+        sendPost('/Server/UpdatePlayerStatistics', {
+            PlayFabId: fabId,
+            Statistics: [
+                {
+                    StatisticName: 'pendingStarshards',
+                    Value: balance,
+                },
+            ],
+        })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+    });
+}
+
 module.exports = {
     registerUser,
     getStarShardBalance,
     setStarShardBalance,
+    getPendingStarShardBalance,
+    setPendingStarShardBalance
 };
