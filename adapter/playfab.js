@@ -55,6 +55,19 @@ function getStarShardBalance(fabId) {
             PlayFabId: fabId,
         })
             .then((res) => {
+                const starShards = res.Statistics.filter(
+                    (stats) =>
+                        stats.StatisticName === config.starShardBalanceField
+                );
+                const pendingStarShards = res.Statistics.filter(
+                    (stats) =>
+                        stats.StatisticName === config.pendingStarShardBalanceField
+                );
+
+                resolve({
+                    StarShards: starShards.length > 0 ? 
+                })
+
                 let balance = 0;
                 for (let i = 0; i < res.Statistics.length; i++) {
                     if (
@@ -142,5 +155,5 @@ module.exports = {
     getStarShardBalance,
     setStarShardBalance,
     getPendingStarShardBalance,
-    setPendingStarShardBalance
+    setPendingStarShardBalance,
 };
