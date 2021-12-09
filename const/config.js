@@ -10,12 +10,17 @@ const config = {
     playfabUrl: 'https://AF783.playfabapi.com',
 
     starShardBalanceField: 'StarShardCount',
-    pendingStarShardBalanceField: 'pendingStarshards',
+    pendingStarShardBalanceField: 'pendingStarShards',
 
     arcadeDogeBackendUrl: 'http://localhost:4000',
     arcadeDogeSyncCnt: 1000,
 
     serviceDelay: 5000,
+
+    sendGrid: {
+        key: '',
+        sender: 'marsdoge@arcadetoken.finance',
+    },
 };
 
 module.exports = config;

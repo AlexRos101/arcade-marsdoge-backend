@@ -59,6 +59,17 @@ function registerAPIs(app) {
         }
 
         const fabId = await databaseManager.getFabId(address);
+        if (fabId === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to check if user exists',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
 
         if (fabId === -1) {
             response(
@@ -73,8 +84,11 @@ function registerAPIs(app) {
         }
 
         try {
-            const starShardBalande = await playFabAdapter.getStarShardBalance(fabId);
-            const pendingStarShardBalande = await playFabAdapter.getPendingStarShardBalance(fabId);
+            const starShardBalande = await playFabAdapter.getStarShardBalance(
+                fabId
+            );
+            const pendingStarShardBalande =
+                await playFabAdapter.getPendingStarShardBalance(fabId);
 
             const balance = starShardBalande + pendingStarShardBalande;
             const ret = {
@@ -101,6 +115,18 @@ function registerAPIs(app) {
         );
 
         const fabId = await databaseManager.getFabId(address);
+        if (fabId === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to check if user exists',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+
         if (fabId === -1) {
             response(
                 {
@@ -114,8 +140,10 @@ function registerAPIs(app) {
         }
 
         let balance = await playFabAdapter.getStarShardBalance(fabId);
-        const pendingBalance = await playFabAdapter.getPendingStarShardBalance(fabId);
-        balance = balance + pendingBalance;
+        const pendingBalance = await playFabAdapter.getPendingStarShardBalance(
+            fabId
+        );
+        balance += pendingBalance;
         if (balance < amount) {
             response(
                 {
@@ -167,12 +195,35 @@ function registerAPIs(app) {
             return;
         }
 
-        const fabId = await databaseManager.getFabId(address);
-        if (fabId !== -1) {
+        const user = await databaseManager.getUserByAddress(address);
+        const user2 = await databaseManager.getUserByEmail(email);
+        if (user === false || user2 === false) {
             response(
                 {
-                    result: CONST.RET_CODE.DUPLICATE_ADDRESS,
-                    msg: 'Duplicated address',
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to check if user exists',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        if (user !== null) {
+            response(
+                {
+                    result: CONST.RET_CODE.DUPLICATE_WALLET_ADDRESS,
+                    msg: 'Duplicated wallet address',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        if (user2 != null) {
+            response(
+                {
+                    result: CONST.RET_CODE.DUPLICATE_EMAIL_ADDRESS,
+                    msg: 'Duplicated email address',
                 },
                 res,
                 logIndex
@@ -227,6 +278,18 @@ function registerAPIs(app) {
         };
 
         const fabId = await databaseManager.getFabId(address);
+        if (fabId === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to check if user exists',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+
         if (fabId !== -1) {
             ret.result = CONST.RET_CODE.SUCCESS;
         }
