@@ -251,13 +251,12 @@ function registerAPIs(app) {
             logManager.info(
                 `link: ${link}`
             );
-            // const sent = await emailer.sendRegisterConfirm(
-            //     username,
-            //     email,
-            //     address,
-            //     link
-            // );
-            const sent = true; // todo
+            const sent = await emailer.sendRegisterConfirm(
+                username,
+                email,
+                address,
+                link
+            );
             if (sent) {
                 const pending = await databaseManager.registerUserAsPending(
                     username,
@@ -356,6 +355,7 @@ function registerAPIs(app) {
                 if (result) {
                     const ret = {
                         result: CONST.RET_CODE.SUCCESS,
+                        msg: 'Registered successfully, please sign in.'
                     };
 
                     response(ret, res, logIndex);

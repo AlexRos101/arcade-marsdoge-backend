@@ -86,7 +86,7 @@ function setPendingStarShardBalance(fabId, balance) {
             PlayFabId: fabId,
             Statistics: [
                 {
-                    StatisticName: 'pendingStarshards',
+                    StatisticName: config.pendingStarShardBalanceField,
                     Value: balance,
                 },
             ],

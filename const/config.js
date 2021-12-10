@@ -20,7 +20,7 @@ const config = {
 
     sendGrid: {
         key: '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',
-        sender: 'arcadedogedev@gmail.com',
+        sender: 'marsdoge@arcadetoken.finance',
     },
 };
 
