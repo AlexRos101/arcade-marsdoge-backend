@@ -10,7 +10,7 @@ const config = {
 
     playfabUrl: 'https://AF783.playfabapi.com',
 
-    starShardBalanceField: 'StarShardCount',
+    starShardBalanceField: 'realStarShards',
     pendingStarShardBalanceField: 'pendingStarShards',
 
     arcadeDogeBackendUrl: 'http://localhost:4000',
