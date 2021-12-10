@@ -19,22 +19,25 @@ async function syncTxs() {
             const fabId = await databaseManager.getFabId(tx.from_address);
 
             if (tx.tx_type === CONST.TX_TYPE.DEPOSIT) {
-                if (fabId === -1) throw new Error('Not exist playfab user');
+                if (fabId === -1 || fabId === false) {
+                    throw new Error('Not exist playfab user');
+                }
 
-                const balance = await playfabAdapter.getPendingStarShardBalance(fabId);
+                const { PendingStarShards } =
+                    await playfabAdapter.getStarShardBalance(fabId);
                 await playfabAdapter.setPendingStarShardBalance(
                     fabId,
-                    balance + tx.amount
+                    PendingStarShards + tx.amount
                 );
             } else if (tx.tx_type === CONST.TX_TYPE.WITHDRAW) {
                 if (fabId === -1) throw new Error('Not exist playfab user');
 
-                const balance = await playfabAdapter.getPendingStarShardBalance(fabId);
+                const { PendingStarShards } =
+                    await playfabAdapter.getStarShardBalance(fabId);
                 await playfabAdapter.setPendingStarShardBalance(
                     fabId,
-                    balance - tx.amount
+                    PendingStarShards - tx.amount
                 );
-            } else {
             }
 
             await databaseManager.updateSyncIndex(tx.id);

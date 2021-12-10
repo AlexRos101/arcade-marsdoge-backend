@@ -1,7 +1,7 @@
 const mysqlConfig = {
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: '123456789',
     database: 'starshard_db',
     connectionLimit: 100,
 };

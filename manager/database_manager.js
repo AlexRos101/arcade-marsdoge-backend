@@ -1,10 +1,9 @@
 const CONST = require('../const/constants');
 const logManager = require('./log_manager');
 
-/* eslint-disable */
 async function connect() {
     return new Promise((resolve, reject) => {
-        mysqlPool
+        global.mysqlPool
             .getConnection()
             .then((connection) => {
                 resolve(connection);
@@ -15,7 +14,6 @@ async function connect() {
             });
     });
 }
-/* eslint-enable */
 
 async function startTransactions(connection) {
     const query = 'START TRANSACTION';
@@ -81,6 +79,120 @@ async function registerUser(username, email, address, fabId) {
     return ret;
 }
 
+async function registerUserAsPending(
+    username,
+    email,
+    address,
+    password,
+    token
+) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        await startTransactions(connection);
+
+        const query =
+            'INSERT INTO tbl_pending_user (username, password, email, token, address, expired) VALUE (?, ?, ?, ?, ?, ADDDATE(NOW(), 3))';
+        await mysqlExecute(connection, query, [
+            username,
+            password,
+            email,
+            token,
+            address,
+        ]);
+
+        await commitTransaction(connection);
+        connection.release();
+
+        return token;
+    } catch (err) {
+        logManager.error(
+            `registerUserAsPending failed: username=${username}, email=${email}, address=${address}`
+        );
+        await onConnectionErr(connection, err, true);
+    }
+
+    return false;
+}
+
+async function isPendingUser(email, address) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT token FROM tbl_pending_user WHERE address = ? AND expired > now()';
+
+        const [rows] = await mysqlExecute(connection, query, [address]);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            return true;
+        }
+    } catch (err) {
+        logManager.error(
+            `isPendingUser failed: email=${email} address=${address}`
+        );
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
+async function getPendingUserByToken(token) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT username, password, email, address, expired FROM tbl_pending_user WHERE token = ? AND expired > now()';
+
+        const [rows] = await mysqlExecute(connection, query, [token]);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            return {
+                username: rows[0].username,
+                password: rows[0].password,
+                email: rows[0].email,
+                address: rows[0].address,
+                tokenExpired: new Date(rows[0].expired) <= Date.now(),
+            };
+        }
+
+        return null;
+    } catch (err) {
+        logManager.error(`getPendingUserByToken failed: token=${token}`);
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
+async function removePendingUserByToken(token) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        await startTransactions(connection);
+        const query = 'DELETE FROM tbl_pending_user WHERE token = ?';
+        await mysqlExecute(connection, query, [token]);
+        await commitTransaction(connection);
+
+        connection.release();
+    } catch (err) {
+        logManager.error(`removePendingUserByToken failed: token=${token}`);
+        await onConnectionErr(connection, err, true);
+    }
+}
+
 async function getFabId(address) {
     let connection = null;
 
@@ -96,12 +208,78 @@ async function getFabId(address) {
         if (rows.length !== 0) {
             return rows[0].fab_id;
         }
+
+        return -1;
     } catch (err) {
         logManager.error(`getFabId failed: address=${address}`);
         await onConnectionErr(connection, err, false);
     }
 
-    return -1;
+    return false;
+}
+
+async function getUserByAddress(address) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT username, email, fab_id, address, created_at FROM tbl_user WHERE address = ?';
+
+        const [rows] = await mysqlExecute(connection, query, [address]);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            return {
+                username: rows[0].username,
+                email: rows[0].email,
+                fabId: rows[0].fab_id,
+                address: rows[0].address,
+                createdAt: rows[0].created_at,
+            };
+        }
+
+        return null;
+    } catch (err) {
+        logManager.error(`getUserByAddress failed: address=${address}`);
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
+async function getUserByEmail(email) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT username, email, fab_id, address, created_at FROM tbl_user WHERE email = ?';
+
+        const [rows] = await mysqlExecute(connection, query, [email]);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            return {
+                username: rows[0].username,
+                email: rows[0].email,
+                fabId: rows[0].fab_id,
+                address: rows[0].address,
+                createdAt: rows[0].created_at,
+            };
+        }
+
+        return null;
+    } catch (err) {
+        logManager.error(`getUserByEmail failed: email=${email}`);
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
 }
 
 async function getSyncIndex() {
@@ -149,7 +327,13 @@ async function updateSyncIndex(syncIndex) {
 
 module.exports = {
     registerUser,
+    registerUserAsPending,
+    isPendingUser,
+    getPendingUserByToken,
+    removePendingUserByToken,
     getFabId,
+    getUserByAddress,
+    getUserByEmail,
     getSyncIndex,
     updateSyncIndex,
 };

@@ -44,12 +44,12 @@ function warn(msg) {
     logger.warn(msg);
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
+const startIndex = Math.floor(Date.now() / 1000) * 1000;
+let lastIndex = startIndex;
 
 function generateLogIndex() {
-    return getRandomInt(10000);
+    lastIndex += 1;
+    return lastIndex;
 }
 
 module.exports = {

@@ -26,12 +26,15 @@
         "no-await-in-loop": 0,
         "comma-dangle": 0,
         "no-return-await": 0,
+        "implicit-arrow-linebreak": 0,
         "operator-linebreak": [2, "after"],
         "prefer-destructuring": ["error", {"AssignmentExpression": {"array": false}}],
         "no-console": 0,
-        "prettier/prettier": ["error", {
+        "prettier/prettier": [1, {
+            "line-break-style": "LF",
             "singleQuote": true,
-            "tabWidth": 4 // disable prettier indent rule, https://github.com/eslint/eslint/issues/10930
+            "tabWidth": 4, // disable prettier indent rule, https://github.com/eslint/eslint/issues/10930
+            "endOfLine": "LF"
         }]
     }
 }
