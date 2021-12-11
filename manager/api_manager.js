@@ -116,7 +116,7 @@ function registerAPIs(app) {
 
     app.post('/verify/swap-game-point', async (req, res) => {
         const { address } = req.fields;
-        const { amount } = req.fields;
+        const amount = parseInt(req.fields.amount);
 
         const logIndex = logManager.generateLogIndex();
         logManager.info(
