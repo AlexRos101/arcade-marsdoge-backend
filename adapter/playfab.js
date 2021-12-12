@@ -67,10 +67,12 @@ function getStarShardBalance(fabId) {
 
                 resolve({
                     StarShards:
-                        starShards.length > 0 ? starShards[0].Value : null,
+                        starShards.length > 0 ?
+                            parseInt(starShards[0].Value) :
+                            null,
                     PendingStarShards:
                         pendingStarShards.length > 0 ?
-                            pendingStarShards[0].Value :
+                            parseInt(pendingStarShards[0].Value) :
                             null,
                 });
             })

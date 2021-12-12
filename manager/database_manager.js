@@ -218,6 +218,31 @@ async function getFabId(address) {
     return false;
 }
 
+async function txSynchronized(txid) {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query = 'SELECT id FROM tbl_history WHERE txid = ?';
+
+        const [rows] = await mysqlExecute(connection, query, [txid]);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            return true;
+        }
+
+        return false;
+    } catch (err) {
+        logManager.error(`txSynchronized failed: txid=${txid}`);
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
 async function getUserByAddress(address) {
     let connection = null;
 
@@ -303,25 +328,57 @@ async function getSyncIndex() {
     return -1;
 }
 
-async function updateSyncIndex(syncIndex) {
+async function updateSyncIndex(connection, syncIndex) {
+    let res = false;
+
+    try {
+        const query = 'UPDATE tbl_status SET sync_index = ? WHERE id = 1';
+        const [rows] = await mysqlExecute(connection, query, [syncIndex]);
+
+        res = rows.affectRows > 0;
+    } catch (err) {
+        logManager.error(`updateSyncIndex failed: syncIndex=${syncIndex}`);
+    }
+    return res;
+}
+
+async function addSyncTx(connection, tx) {
+    let res = false;
+
+    try {
+        const query = 'INSERT INTO tbl_history (txid) VALUE(?)';
+        const [rows] = await mysqlExecute(connection, query, [tx.txid]);
+
+        res = rows.insertId > 0;
+    } catch (err) {
+        logManager.error(`addSyncTx failed: syncIndex=${tx.id}`);
+    }
+    return res;
+}
+
+async function sync(tx) {
     let connection = null;
     let res = false;
 
     try {
         connection = await connect();
+        if (!await addSyncTx(connection, tx)) {
+            throw new Error('Adding sync tx failed.');
+        }
 
-        await startTransactions(connection);
-        const query = 'UPDATE tbl_status SET sync_index = ? WHERE id = 1';
-        const [rows] = await mysqlExecute(connection, query, [syncIndex]);
+        if (!await updateSyncIndex(connection, tx.id)) {
+            throw new Error('Updating sync index failed.');
+        }
+
         await commitTransaction(connection);
 
         connection.release();
-
-        res = rows.affectRows > 0;
+        res = true;
     } catch (err) {
-        logManager.error(`updateSyncIndex failed: syncIndex=${syncIndex}`);
+        logManager.error(`addSyncTx failed: tx=${JSON.stringify(tx)}`);
         await onConnectionErr(connection, err, true);
     }
+
     return res;
 }
 
@@ -336,4 +393,6 @@ module.exports = {
     getUserByEmail,
     getSyncIndex,
     updateSyncIndex,
+    txSynchronized,
+    sync
 };
