@@ -409,6 +409,36 @@ function registerAPIs(app) {
 
         response(ret, res, logIndex);
     });
+
+    app.post('/verify/txid', async (req, res) => {
+        const { txid } = req.fields;
+
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/verify/txid" api is called: txid=${txid}`
+        );
+
+        const ret = {
+            result: CONST.RET_CODE.FAILED,
+        };
+
+        const isSynchronized = await databaseManager.txSynchronized(txid);
+        if (isSynchronized === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Not synchronized yet',
+                },
+                res,
+                logIndex
+            );
+            return;
+        } else {
+            ret.result = CONST.RET_CODE.SUCCESS;
+        }
+
+        response(ret, res, logIndex);
+    });
 }
 
 module.exports = registerAPIs;
