@@ -346,8 +346,8 @@ async function addSyncTx(connection, tx) {
     let res = false;
 
     try {
-        const query = 'INSERT INTO tbl_history (txid) VALUE(?)';
-        const [rows] = await mysqlExecute(connection, query, [tx.txid]);
+        const query = 'INSERT INTO tbl_history (sync_index, txid) VALUE(?, ?)';
+        const [rows] = await mysqlExecute(connection, query, [tx.id, tx.txid]);
 
         res = rows.insertId > 0;
     } catch (err) {
