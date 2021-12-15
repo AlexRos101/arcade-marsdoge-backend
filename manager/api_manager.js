@@ -3,6 +3,7 @@ const { soliditySha3, isAddress } = require('web3-utils');
 const validator = require('email-validator');
 const config = require('../const/config');
 const emailer = require('../adapter/emailer');
+const { registerSuccessHTML } = require('../assets');
 const playFabAdapter = require('../adapter/playfab');
 const databaseManager = require('./database_manager');
 const CONST = require('../const/constants');
@@ -23,6 +24,15 @@ function response(ret, res, logIndex) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200);
     res.json(ret);
+}
+
+function responseHtml(ret, res, logIndex) {
+    logManager.info(`index: ${logIndex}`);
+
+    res.setHeader('content-type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(200);
+    res.send(ret);
 }
 
 function responseInvalid(res, logIndex) {
@@ -357,12 +367,7 @@ function registerAPIs(app) {
                 );
 
                 if (result) {
-                    const ret = {
-                        result: CONST.RET_CODE.SUCCESS,
-                        msg: 'Registered successfully, please sign in.'
-                    };
-
-                    response(ret, res, logIndex);
+                    responseHtml(registerSuccessHTML(), res, logIndex);
                 } else {
                     responseFailed(res, logIndex);
                 }
