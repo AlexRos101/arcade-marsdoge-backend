@@ -251,52 +251,56 @@ function registerAPIs(app) {
             logManager.info(
                 `link: ${link}`
             );
-            const sent = await emailer.sendRegisterConfirm(
-                username,
-                email,
-                address,
-                link
-            );
-            if (sent) {
-                const pending = await databaseManager.registerUserAsPending(
-                    username,
-                    email,
-                    address,
-                    password,
-                    token
-                );
-                if (pending) {
-                    response(
-                        {
-                            result: CONST.RET_CODE.SUCCESS,
-                            msg: 'Please check email',
-                            data: {
-                                link
-                            }
-                        },
-                        res,
-                        logIndex
+            const callback = (error) => {
+                if (!error) {
+                    const pending = await databaseManager.registerUserAsPending(
+                        username,
+                        email,
+                        address,
+                        password,
+                        token
                     );
+                    if (pending) {
+                        response(
+                            {
+                                result: CONST.RET_CODE.SUCCESS,
+                                msg: 'Please check email',
+                                data: {
+                                    link
+                                }
+                            },
+                            res,
+                            logIndex
+                        );
+                    } else {
+                        response(
+                            {
+                                result: CONST.RET_CODE.FAILED,
+                                msg: 'Failed to register user',
+                            },
+                            res,
+                            logIndex
+                        );
+                    }
                 } else {
                     response(
                         {
-                            result: CONST.RET_CODE.FAILED,
-                            msg: 'Failed to register user',
+                            result: CONST.RET_CODE.FAILED_TO_SEND_EMAIL,
+                            msg: 'Failed to send email',
                         },
                         res,
                         logIndex
                     );
                 }
-            } else {
-                response(
-                    {
-                        result: CONST.RET_CODE.FAILED_TO_SEND_EMAIL,
-                        msg: 'Failed to send email',
-                    },
-                    res,
-                    logIndex
-                );
             }
+
+            emailer.sendRegisterConfirm(
+                username,
+                email,
+                address,
+                link,
+                callback
+            );
         } else {
             response(
                 {

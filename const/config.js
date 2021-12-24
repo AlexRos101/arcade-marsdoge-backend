@@ -18,10 +18,15 @@ const config = {
 
     serviceDelay: 5000,
 
-    sendGrid: {
-        key: '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',
-        sender: 'marsdoge@arcadetoken.finance',
-    },
+    // sendGrid: {
+    //     key: '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',
+    //     sender: 'marsdoge@arcadetoken.finance',
+    // },
+
+    mailgun: {
+        key: '0724ba9e5e68638cd2763f406dc3e0fe-1831c31e-a32830d3',
+        domain: 'arcadetoken.finance'
+    }
 };
 
 module.exports = config;

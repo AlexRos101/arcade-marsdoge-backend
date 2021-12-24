@@ -6,7 +6,7 @@ const registerHTML = String(
 );
 
 function template(link) {
-    return registerHTML.replace('http://htmlemail.io', link);
+    return registerHTML.replace('http://www.mailgun.com', link);
 }
 
 module.exports = {
