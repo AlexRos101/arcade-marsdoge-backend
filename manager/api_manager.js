@@ -248,6 +248,7 @@ function registerAPIs(app) {
                 res,
                 logIndex
             );
+            return;
         }
 
         const isPending = await databaseManager.isPendingUser(email, address);
