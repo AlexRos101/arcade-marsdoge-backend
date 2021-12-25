@@ -150,7 +150,7 @@ async function getPendingUserByToken(token) {
         connection = await connect();
 
         const query =
-            'SELECT username, password, email, address, expired FROM tbl_pending_user WHERE token = ? AND expired > now()';
+            'SELECT username, password, email, address, expired FROM tbl_pending_user WHERE token = ?';
 
         const [rows] = await mysqlExecute(connection, query, [token]);
 
