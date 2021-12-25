@@ -251,7 +251,7 @@ function registerAPIs(app) {
             logManager.info(
                 `link: ${link}`
             );
-            const callback = (error) => {
+            const callback = async (error) => {
                 if (!error) {
                     const pending = await databaseManager.registerUserAsPending(
                         username,
