@@ -445,6 +445,115 @@ function registerAPIs(app) {
 
         response(ret, res, logIndex);
     });
+
+    // game settings
+    app.get('/settings/game-version', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/game-version" api is called`
+        );
+
+        const version = await databaseManager.getGameVersion();
+        if (version === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get game version',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                version
+            },
+        };
+        response(ret, res, logIndex);
+    });
+
+    app.get('/settings/plant-cycle', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/plant-cycle" api is called`
+        );
+
+        const plantCycle = await databaseManager.getPlantCycle();
+        if (plantCycle === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get plant cycle',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                PlantCycle: plantCycle
+            },
+        };
+        response(ret, res, logIndex);
+    });
+
+    app.get('/settings/yield-rewards', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/yield-rewards" api is called`
+        );
+
+        const yieldRewards = await databaseManager.getYieldRewards();
+        if (yieldRewards === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get yield rewards',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                YieldRewards: yieldRewards
+            },
+        };
+        response(ret, res, logIndex);
+    });
+
+    app.get('/settings/item-prices', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/item-prices" api is called`
+        );
+
+        const itemPrices = await databaseManager.getItemPrices();
+        if (itemPrices === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get item prices',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                ItemPrices: itemPrices
+            },
+        };
+        response(ret, res, logIndex);
+    });
 }
 
 module.exports = registerAPIs;
