@@ -422,16 +422,16 @@ async function getPlantCycle() {
         connection.release();
 
         if (rows.length !== 0) {
-            return rows.map(row => {
-                return {
-                    [row.kind]: parseInt(row.value)
-                };
+            const plantCycle = {};
+            rows.forEach(row => {
+                plantCycle[row.kind] = parseInt(row.value);
             });
+            return plantCycle;
         }
 
         return null;
     } catch (err) {
-        logManager.error('getGameVersion failed');
+        logManager.error('getPlantCycle failed');
         await onConnectionErr(connection, err, false);
     }
 
@@ -452,16 +452,16 @@ async function getYieldRewards() {
         connection.release();
 
         if (rows.length !== 0) {
-            return rows.map(row => {
-                return {
-                    [row.kind]: parseInt(row.value)
-                };
+            const yieldRewards = {};
+            rows.forEach(row => {
+                yieldRewards[row.kind] = parseInt(row.value);
             });
+            return yieldRewards;
         }
 
         return null;
     } catch (err) {
-        logManager.error('getGameVersion failed');
+        logManager.error('getYieldRewards failed');
         await onConnectionErr(connection, err, false);
     }
 
@@ -482,16 +482,16 @@ async function getItemPrices() {
         connection.release();
 
         if (rows.length !== 0) {
-            return rows.map(row => {
-                return {
-                    [row.kind]: parseInt(row.value)
-                };
+            const itemPrices = {};
+            rows.forEach(row => {
+                itemPrices[row.kind] = parseInt(row.value);
             });
+            return itemPrices;
         }
 
         return null;
     } catch (err) {
-        logManager.error('getGameVersion failed');
+        logManager.error('getItemPrices failed');
         await onConnectionErr(connection, err, false);
     }
 
