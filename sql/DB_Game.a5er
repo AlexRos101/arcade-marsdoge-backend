@@ -42,7 +42,7 @@ PName=tbl_game_setting
 LName=GameSetting
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1700
 Top=1100
 Field="ID","id","@INT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -55,7 +55,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20211229183144
-Position="Main",1700,1100
+Position="MAIN",1700,1100
 
 [Entity]
 PName=tbl_history
@@ -85,13 +85,13 @@ Page=MAIN
 Left=2050
 Top=600
 Field="ID","id","@INT","NOT NULL",0,"","",$FFFFFFFF,""
-Field="Synchronized Index","sync_index","@INT","NOT NULL",,"","",$FFFFFFFF,""
+Field="Synchronized Block Number","block_number","@INT","NOT NULL",,"","",$FFFFFFFF,""
 Field="Created At","created_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
 Field="Updated At","updated_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=Gradation
 Color=$000000
 BkColor=$DEB2C7
-ModifiedDateTime=20211229183152
+ModifiedDateTime=20220104221047
 Position="MAIN",2050,600
 
 [Entity]

@@ -1,0 +1,1 @@
+ALTER TABLE `tbl_status` CHANGE `sync_index` `block_number` INT(11) NOT NULL;
