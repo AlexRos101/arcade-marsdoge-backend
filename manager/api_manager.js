@@ -3,6 +3,7 @@ const { soliditySha3, isAddress } = require('web3-utils');
 const validator = require('email-validator');
 const config = require('../const/config');
 const emailer = require('../adapter/emailer');
+const { registerSuccessHTML } = require('../assets');
 const playFabAdapter = require('../adapter/playfab');
 const databaseManager = require('./database_manager');
 const CONST = require('../const/constants');
@@ -23,6 +24,15 @@ function response(ret, res, logIndex) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200);
     res.json(ret);
+}
+
+function responseHtml(ret, res, logIndex) {
+    logManager.info(`index: ${logIndex}`);
+
+    res.setHeader('content-type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(200);
+    res.send(ret);
 }
 
 function responseInvalid(res, logIndex) {
@@ -238,6 +248,7 @@ function registerAPIs(app) {
                 res,
                 logIndex
             );
+            return;
         }
 
         const isPending = await databaseManager.isPendingUser(email, address);
@@ -251,52 +262,56 @@ function registerAPIs(app) {
             logManager.info(
                 `link: ${link}`
             );
-            const sent = await emailer.sendRegisterConfirm(
-                username,
-                email,
-                address,
-                link
-            );
-            if (sent) {
-                const pending = await databaseManager.registerUserAsPending(
-                    username,
-                    email,
-                    address,
-                    password,
-                    token
-                );
-                if (pending) {
-                    response(
-                        {
-                            result: CONST.RET_CODE.SUCCESS,
-                            msg: 'Please check email',
-                            data: {
-                                link
-                            }
-                        },
-                        res,
-                        logIndex
+            const callback = async (error) => {
+                if (!error) {
+                    const pending = await databaseManager.registerUserAsPending(
+                        username,
+                        email,
+                        address,
+                        password,
+                        token
                     );
+                    if (pending) {
+                        response(
+                            {
+                                result: CONST.RET_CODE.SUCCESS,
+                                msg: 'Please check email',
+                                data: {
+                                    link
+                                }
+                            },
+                            res,
+                            logIndex
+                        );
+                    } else {
+                        response(
+                            {
+                                result: CONST.RET_CODE.FAILED,
+                                msg: 'Failed to register user',
+                            },
+                            res,
+                            logIndex
+                        );
+                    }
                 } else {
                     response(
                         {
-                            result: CONST.RET_CODE.FAILED,
-                            msg: 'Failed to register user',
+                            result: CONST.RET_CODE.FAILED_TO_SEND_EMAIL,
+                            msg: 'Failed to send email',
                         },
                         res,
                         logIndex
                     );
                 }
-            } else {
-                response(
-                    {
-                        result: CONST.RET_CODE.FAILED_TO_SEND_EMAIL,
-                        msg: 'Failed to send email',
-                    },
-                    res,
-                    logIndex
-                );
             }
+
+            emailer.sendRegisterConfirm(
+                username,
+                email,
+                address,
+                link,
+                callback
+            );
         } else {
             response(
                 {
@@ -353,12 +368,7 @@ function registerAPIs(app) {
                 );
 
                 if (result) {
-                    const ret = {
-                        result: CONST.RET_CODE.SUCCESS,
-                        msg: 'Registered successfully, please sign in.'
-                    };
-
-                    response(ret, res, logIndex);
+                    responseHtml(registerSuccessHTML(), res, logIndex);
                 } else {
                     responseFailed(res, logIndex);
                 }
@@ -433,6 +443,115 @@ function registerAPIs(app) {
             ret.result = CONST.RET_CODE.SUCCESS;
         }
 
+        response(ret, res, logIndex);
+    });
+
+    // game settings
+    app.get('/settings/game-version', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/game-version" api is called`
+        );
+
+        const version = await databaseManager.getGameVersion();
+        if (version === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get game version',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                version
+            },
+        };
+        response(ret, res, logIndex);
+    });
+
+    app.get('/settings/plant-cycle', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/plant-cycle" api is called`
+        );
+
+        const plantCycle = await databaseManager.getPlantCycle();
+        if (plantCycle === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get plant cycle',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                PlantCycle: plantCycle
+            },
+        };
+        response(ret, res, logIndex);
+    });
+
+    app.get('/settings/yield-rewards', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/yield-rewards" api is called`
+        );
+
+        const yieldRewards = await databaseManager.getYieldRewards();
+        if (yieldRewards === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get yield rewards',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                YieldRewards: yieldRewards
+            },
+        };
+        response(ret, res, logIndex);
+    });
+
+    app.get('/settings/item-prices', async (req, res) => {
+        const logIndex = logManager.generateLogIndex();
+        logManager.info(
+            `index: ${logIndex}, "/settings/item-prices" api is called`
+        );
+
+        const itemPrices = await databaseManager.getItemPrices();
+        if (itemPrices === false) {
+            response(
+                {
+                    result: CONST.RET_CODE.FAILED,
+                    msg: 'Failed to get item prices',
+                },
+                res,
+                logIndex
+            );
+            return;
+        }
+        const ret = {
+            result: CONST.RET_CODE.SUCCESS,
+            data: {
+                ItemPrices: itemPrices
+            },
+        };
         response(ret, res, logIndex);
     });
 }

@@ -1,33 +1,30 @@
-const sgMail = require('@sendgrid/mail');
+const mailgun = require('mailgun-js');
 const config = require('../const/config');
 const { template } = require('../assets');
 const logManager = require('../manager/log_manager');
 
-sgMail.setApiKey(config.sendGrid.key);
+const mg = mailgun({apiKey: config.mailgun.key, domain: config.mailgun.domain});
 
-async function sendRegisterConfirm(username, email, address, link) {
-    const emailObj = {
+async function sendRegisterConfirm(username, email, address, link, callback) {
+    const data = {
+        // from: 'admin@arcadetoken.finance',
+        // to: 'hungrywarrior081@gmail.com',
+        from: "admin@arcadetoken.finance",
         to: email,
-        from: config.sendGrid.sender,
         subject: 'MarsDoge Email verification',
-        html: template(link),
+        html: template(link)
     };
 
     try {
-        const response = await sgMail.send(emailObj);
-        if (response.length > 0 && response[0].statusCode === 202) {
-            logManager.error(
-                `sendRegisterConfirm sent: username=${username}, email=${email}, address=${address}, link=${link}`
-            );
-
-            return true;
-        }
+        mg.messages().send(data, function (error, body) {
+            callback(error);
+        });
     } catch (error) {
         logManager.error(
             `sendRegisterConfirm failed: username=${username}, email=${email}, address=${address}, link=${link}, error=${error}`
         );
+        callback(error);
     }
-    return false;
 }
 
 module.exports = {

@@ -1,0 +1,139 @@
+﻿# A5:ER FORMAT:11
+# A5:ER ENCODING:UTF8
+# A5:ER Mk-1 Copyright (C)2007 m.matsubara
+# A5:SQL Mk-2 Copyright (C)1997 m.matsubara
+#  http://www.wind.sannet.ne.jp/m_matsu/developer/a5m2/
+
+[Manager]
+ProjectName=DB_Game
+Author=Alex.R
+MaxEntityRowShow=1000
+ReadOnlyRecommend=0
+Page=Main
+PageInfo="Main",2,"A3Landscape",$FFFFFF
+LogicalView=0
+DecodeDomain=0
+ViewModePageIndividually=1
+ViewMode=2
+ViewFormat=0
+UseNondependenceDashLine=0
+FontName=Tahoma
+FontSize=11
+PaperSize=A4Landscape
+HeaderLeft=
+HeaderCenter=
+HeaderRight=
+FooterLeft=
+FooterCenter=
+FooterRight=
+ShowPageoutRelation=1
+RDBMSType=5
+RDBMSTypeName=MySQL
+DefaultPkName=%0:s_PKC
+DefaultPkIndexName=%0:s_PKI
+DefaultIndexName=%0:s_IX%1:d
+DefaultFkName=%0:s_FK%1:d
+SqlSeparator=0
+ShowTag=1
+ShowCommonAttributes=0
+
+[Entity]
+PName=tbl_game_setting
+LName=GameSetting
+Comment=
+TableOption=
+Page=Main
+Left=1700
+Top=1100
+Field="ID","id","@INT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
+Field="category","category","@VARCHAR(32)","NOT NULL",,"","",$FFFFFFFF,""
+Field="kind","kind","@VARCHAR(32)","NOT NULL",,"","",$FFFFFFFF,""
+Field="value","value","@VARCHAR(32)","NOT NULL",,"","",$FFFFFFFF,""
+Field="created_at","created_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+Field="updated_at","updated_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20211229183144
+Position="Main",1700,1100
+
+[Entity]
+PName=tbl_history
+LName=History
+Comment=
+TableOption=
+Page=MAIN
+Left=2550
+Top=600
+Field="ID","id","@INT","NOT NULL",0,"","",$FFFFFFFF,""
+Field="Synchronized Index","sync_index","@INT","NOT NULL",,"","",$FFFFFFFF,""
+Field="TX ID","txid","@VARCHAR(128)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Created At","created_at","@DATE","NOT NULL",,"","",$FFFFFFFF,""
+Field="Updated At","updated_at","@DATE","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=Gradation
+Color=$000000
+BkColor=$DEB2C7
+ModifiedDateTime=20211221160211
+Position="MAIN",2550,600
+
+[Entity]
+PName=tbl_status
+LName=Status
+Comment=
+TableOption=
+Page=MAIN
+Left=2050
+Top=600
+Field="ID","id","@INT","NOT NULL",0,"","",$FFFFFFFF,""
+Field="Synchronized Index","sync_index","@INT","NOT NULL",,"","",$FFFFFFFF,""
+Field="Created At","created_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+Field="Updated At","updated_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=Gradation
+Color=$000000
+BkColor=$DEB2C7
+ModifiedDateTime=20211229183152
+Position="MAIN",2050,600
+
+[Entity]
+PName=tbl_pending_user
+LName=Pending User
+Comment=
+TableOption=
+Page=MAIN
+Left=650
+Top=600
+Field="ID","id","@INT","NOT NULL",0,"","",$FFFFFFFF,""
+Field="User Name","username","@VARCHAR(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Password","password","@VARCHAR(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Email Address","email","@VARCHAR(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Token","token","@VARCHAR(128)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Address","address","@VARCHAR(128)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Expired Date","expired","@DATE","NOT NULL",,"","",$FFFFFFFF,""
+Field="Created At","created_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+Field="Updated At","updated_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=Gradation
+Color=$000000
+BkColor=$FFCC66
+ModifiedDateTime=20211229183203
+Position="MAIN",650,600
+
+[Entity]
+PName=tbl_user
+LName=User
+Comment=
+TableOption=
+Page=MAIN
+Left=1300
+Top=600
+Field="ID","id","@INT","NOT NULL",0,"","",$FFFFFFFF,""
+Field="User Name","username","@VARCHAR(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Email Address","email","@VARCHAR(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="PlayFab ID","fab_id","@VARCHAR(32)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Address","address","@VARCHAR(128)","NOT NULL",,"","",$FFFFFFFF,""
+Field="Created At","created_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+Field="Updated At","updated_at","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=Gradation
+Color=$000000
+BkColor=$FFCC66
+ModifiedDateTime=20211229183157
+Position="MAIN",1300,600

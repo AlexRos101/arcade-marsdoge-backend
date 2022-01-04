@@ -150,7 +150,7 @@ async function getPendingUserByToken(token) {
         connection = await connect();
 
         const query =
-            'SELECT username, password, email, address, expired FROM tbl_pending_user WHERE token = ? AND expired > now()';
+            'SELECT username, password, email, address, expired FROM tbl_pending_user WHERE token = ?';
 
         const [rows] = await mysqlExecute(connection, query, [token]);
 
@@ -382,6 +382,122 @@ async function sync(tx) {
     return res;
 }
 
+async function getGameVersion() {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT value FROM tbl_game_setting WHERE category LIKE ? AND kind LIKE ?';
+
+        const [rows] = await mysqlExecute(connection, query, ['Game', 'Version']);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            return rows[0].value;
+        }
+
+        return null;
+    } catch (err) {
+        logManager.error('getGameVersion failed');
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
+async function getPlantCycle() {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT kind, value FROM tbl_game_setting WHERE category LIKE ?';
+
+        const [rows] = await mysqlExecute(connection, query, ['PlantCycle']);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            const plantCycle = {};
+            rows.forEach(row => {
+                plantCycle[row.kind] = parseInt(row.value);
+            });
+            return plantCycle;
+        }
+
+        return null;
+    } catch (err) {
+        logManager.error('getPlantCycle failed');
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
+async function getYieldRewards() {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT kind, value FROM tbl_game_setting WHERE category LIKE ?';
+
+        const [rows] = await mysqlExecute(connection, query, ['YieldRewards']);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            const yieldRewards = {};
+            rows.forEach(row => {
+                yieldRewards[row.kind] = parseInt(row.value);
+            });
+            return yieldRewards;
+        }
+
+        return null;
+    } catch (err) {
+        logManager.error('getYieldRewards failed');
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
+async function getItemPrices() {
+    let connection = null;
+
+    try {
+        connection = await connect();
+
+        const query =
+            'SELECT kind, value FROM tbl_game_setting WHERE category LIKE ?';
+
+        const [rows] = await mysqlExecute(connection, query, ['ItemPrices']);
+
+        connection.release();
+
+        if (rows.length !== 0) {
+            const itemPrices = {};
+            rows.forEach(row => {
+                itemPrices[row.kind] = parseInt(row.value);
+            });
+            return itemPrices;
+        }
+
+        return null;
+    } catch (err) {
+        logManager.error('getItemPrices failed');
+        await onConnectionErr(connection, err, false);
+    }
+
+    return false;
+}
+
 module.exports = {
     registerUser,
     registerUserAsPending,
@@ -394,5 +510,9 @@ module.exports = {
     getSyncIndex,
     updateSyncIndex,
     txSynchronized,
-    sync
+    sync,
+    getGameVersion,
+    getPlantCycle,
+    getYieldRewards,
+    getItemPrices
 };
